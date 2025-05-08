@@ -29,6 +29,7 @@ CAFE_CLARO=(255, 165, 93)
 PURPLE=(58, 89, 209)
 AZUL= (61, 144, 215)
 GRIS= (219, 219, 219)
+AMARILLO= (252, 242, 89)
 
 # Opciones config
 volumen_opciones = ["Bajo", "Medio", "Alto"]
@@ -196,7 +197,7 @@ def juego():
     proyectil_2_pos=[numero,0]
     ajuste=random.randint(50, 200)
     proyectil_3_pos=[ancho+ajuste,0]
-    proyectil_tam=15
+    proyectil_tam=10
 
     #enemigos
     enemigos =[]
@@ -227,7 +228,7 @@ def juego():
     line_1=[20,alto-40,0,alto-10]
     line_2=[40,alto-40,20,alto-10]
     line_3=[60,alto-40,40,alto-10]
-    line_vel=2
+    line_vel=1
 
     # Disparos
     velocidad_disparo = 12
@@ -331,18 +332,26 @@ def juego():
         
         # dibujar proyectiles
         if(proyectil_1_pos[1]< alto-20):
-            pygame.draw.circle(pantalla,BLANCO,(proyectil_1_pos[0],proyectil_1_pos[1]),10,0)
+            pygame.draw.circle(pantalla,ROJO,(proyectil_1_pos[0]+7,proyectil_1_pos[1]-7),proyectil_tam-4,0)
+            pygame.draw.circle(pantalla,AMARILLO,(proyectil_1_pos[0]+4,proyectil_1_pos[1]-4),proyectil_tam-2,0)
+            pygame.draw.circle(pantalla,BLANCO,(proyectil_1_pos[0],proyectil_1_pos[1]),proyectil_tam,0)
+            
+            
         else:
             proyectil_1_pos=[ancho,0]
             score+=1
         if(proyectil_2_pos[1]< alto-20):
-            pygame.draw.circle(pantalla,BLANCO,(proyectil_2_pos[0],proyectil_2_pos[1]),10,0)
+            pygame.draw.circle(pantalla,ROJO,(proyectil_2_pos[0]+7,proyectil_2_pos[1]-7),proyectil_tam-4,0)
+            pygame.draw.circle(pantalla,AMARILLO,(proyectil_2_pos[0]+4,proyectil_2_pos[1]-4),proyectil_tam-2,0)
+            pygame.draw.circle(pantalla,BLANCO,(proyectil_2_pos[0],proyectil_2_pos[1]),proyectil_tam,0)
         else:
             proyectil_2_pos=[random.randint(ancho/2, ancho),0]
             pro_velocidad_2 = random.randint(2, 6)
             score+=1
         if(proyectil_3_pos[1]< alto-20):
-            pygame.draw.circle(pantalla,BLANCO,(proyectil_3_pos[0],proyectil_3_pos[1]),10,0)
+            pygame.draw.circle(pantalla,ROJO,(proyectil_3_pos[0]+7,proyectil_3_pos[1]-7),proyectil_tam-4,0)
+            pygame.draw.circle(pantalla,AMARILLO,(proyectil_3_pos[0]+4,proyectil_3_pos[1]-4),proyectil_tam-2,0)
+            pygame.draw.circle(pantalla,BLANCO,(proyectil_3_pos[0],proyectil_3_pos[1]),proyectil_tam,0)
         else:
             proyectil_3_pos=[ancho+ajuste,0]
             match dificultad_idx:
@@ -390,6 +399,7 @@ def juego():
         pygame.draw.line(pantalla, CAFE_CLARO,(line_2[0]+900,line_2[1]),(line_2[2]+900,line_2[3]),5)
         pygame.draw.line(pantalla, CAFE_CLARO,(line_3[0]+900,line_3[1]),(line_3[2]+900,line_3[3]),5)
 
+        #repetir el bucle de las lineas
         if line_1[2]==-150:
             line_1=[20,alto-40,0,alto-10]
             line_2=[40,alto-40,20,alto-10]
@@ -413,18 +423,18 @@ def juego():
                         enemigos.pop(i)
                         score+=5
                         break
-                
+        #decender enemigos      
         if enemigos != [] and enemigos[0][1]<480:
             for enemigo in enemigos:
                 enemigo[1]+= 2
 
         #colicion con los proyectiles
         rect = pygame.Rect(jugador_pos[0], jugador_pos[1], jugador_tam, jugador_tam)
-        if colision_circulo_rect(proyectil_1_pos, proyectil_tam-7, rect):
+        if colision_circulo_rect(proyectil_1_pos, proyectil_tam-3, rect):
             fin()
-        if colision_circulo_rect(proyectil_2_pos, proyectil_tam-7, rect):
+        if colision_circulo_rect(proyectil_2_pos, proyectil_tam-3, rect):
             fin()
-        if colision_circulo_rect(proyectil_3_pos, proyectil_tam-7, rect):
+        if colision_circulo_rect(proyectil_3_pos, proyectil_tam-3, rect):
             fin()
 
         # Actualizar pantalla
