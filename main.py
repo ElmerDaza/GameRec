@@ -30,12 +30,27 @@ PURPLE=(58, 89, 209)
 AZUL= (61, 144, 215)
 GRIS= (219, 219, 219)
 
+# Opciones config
+volumen_opciones = ["Bajo", "Medio", "Alto"]
+dificultad_opciones = ["Fácil", "Media", "Difícil"]
+volumen_idx = 1
+dificultad_idx = 0
+
+# Fuente
+fuente = pygame.font.SysFont(None, 60)
+fuente_2 = pygame.font.SysFont(None, 20)
+fuente_3 = pygame.font.SysFont(None, 35)
+
 #puntuacion
 score = 0
 mejor_puntuacion=0
 
 #ejecucion del juego
 ejecutando = False
+# Bucle principal del menú
+en_menu = True
+#bucle config
+confi=True
 
 #colicion de rectangulos
 def colicion_rec(rectangulo_1, rectangulo_2):
@@ -61,13 +76,10 @@ def fin():
     perdiste.play()
     menu()
 
-# Fuente
-fuente = pygame.font.SysFont(None, 60)
-fuente_2 = pygame.font.SysFont(None, 20)
-fuente_3 = pygame.font.SysFont(None, 35)
+
 
 # Botones
-def dibujar_boton(texto, x, y, ancho, alto, color, color_hover, accion=None):
+def dibujar_boton(texto, x, y, ancho, alto, color, color_hover, accion=None, fuente = fuente):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
@@ -81,14 +93,19 @@ def dibujar_boton(texto, x, y, ancho, alto, color, color_hover, accion=None):
     texto_superficie = fuente.render(texto, True, NEGRO)
     texto_rect = texto_superficie.get_rect(center=(x + ancho // 2, y + alto // 2))
     pantalla.blit(texto_superficie, texto_rect)
-
+#texto config
+def dibujar_texto(texto, x, y, seleccionado=False, fuente=fuente):
+    color = ROJO if seleccionado else NEGRO
+    texto_render = fuente.render(texto, True, color)
+    pantalla.blit(texto_render, (x, y))
 # Acciones
 def jugar():
-    global en_menu, ejecutando
+    global en_menu, ejecutando,score
     en_menu = False
     ejecutando = True
     pygame.mixer.music.play(-1)  # -1 significa que se repite infinitamente
     pygame.mixer.music.set_volume(0.5)  # Volumen entre 0.0 y 1.0
+    score=0
     juego()
 
 
@@ -96,8 +113,12 @@ def salir():
     pygame.quit()
     sys.exit()
 
-# Bucle principal del menú
-en_menu = True
+def btn_vol():
+    global volumen_idx
+    volumen_idx = (volumen_idx + 1) % len(volumen_opciones)
+def btn_dif(): 
+    global dificultad_idx 
+    dificultad_idx = (dificultad_idx + 1) % len(dificultad_opciones)
 
 def menu():
     while en_menu:
@@ -112,8 +133,10 @@ def menu():
         pantalla.blit(score, (20, 20))
 
         # Botones
-        dibujar_boton("Jugar", 300, 250, 200, 60, GRIS, AZUL, jugar)
-        dibujar_boton("Salir", 300, 350, 200, 60, GRIS, AZUL, salir)
+        dibujar_boton("Jugar", 300, 200, 200, 60, GRIS, AZUL, jugar)
+        dibujar_boton("Config",300,275,200,60,GRIS,AZUL, config)
+        dibujar_boton("Salir", 300, 350, 200, 60, GRIS, ROJO, salir)
+        
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -122,11 +145,46 @@ def menu():
         pygame.display.flip()
         pygame.time.Clock().tick(60)
 
+def config():
+    global volumen_idx, dificultad_idx
+    
+    confi=True
+    while confi:
+        pantalla.fill(BLANCO)
 
+        # Eventos
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_ESCAPE:
+                    confi = False
+                    menu()
+                elif evento.key == pygame.K_RIGHT:
+                    volumen_idx = (volumen_idx + 1) % len(volumen_opciones)
+                elif evento.key == pygame.K_LEFT:
+                    volumen_idx = (volumen_idx - 1) % len(volumen_opciones)
+                elif evento.key == pygame.K_DOWN:
+                    dificultad_idx = (dificultad_idx + 1) % len(dificultad_opciones)
+                elif evento.key == pygame.K_UP:
+                    dificultad_idx = (dificultad_idx - 1) % len(dificultad_opciones)
+
+        # Dibujar textos
+        dibujar_texto("CONFIGURACIÓN", 200, 50)
+        dibujar_texto(f"Volumen: {volumen_opciones[volumen_idx]}", 250, 200, True,fuente_3)
+        dibujar_texto(f"Dificultad: {dificultad_opciones[dificultad_idx]}", 250, 300, True,fuente_3)
+        dibujar_texto("Presiona ESC para volver al menú", 200, 500,fuente=fuente_2)
+        dibujar_boton(">",450,190,35,35,GRIS,VERDE,btn_vol)
+        dibujar_boton(">",450,290,35,35,GRIS,VERDE,btn_dif)
+        dibujar_boton("X",20,20,40,40,GRIS,ROJO,fin,fuente_3)
+
+        pygame.display.flip()
+        pygame.time.Clock().tick(30)
 
 # Bucle principal del juego
 def juego():
-    global ejecutando, score, mejor_puntuacion
+    global ejecutando, score, mejor_puntuacion, dificultad_idx
     # Posición inicial del jugador
     jugador_pos = [2, alto-120]
     jugador_tam = 50
@@ -139,8 +197,31 @@ def juego():
     ajuste=random.randint(50, 200)
     proyectil_3_pos=[ancho+ajuste,0]
     proyectil_tam=15
-    pro_velocidad = 3
-    pro_velocidad_2 = random.randint(2, 6)
+
+    #enemigos
+    enemigos =[]
+    frecuencia_enemigos = 1000
+    
+
+
+    match dificultad_idx:
+        case 0:
+            pro_velocidad = 3
+            pro_velocidad_2 = random.randint(2, 6)
+            velocidad_enemigo = 3
+
+        case 1:
+            pro_velocidad = 7
+            pro_velocidad_2 = random.randint(5, 10)
+            velocidad_enemigo = 6
+
+        case 2:
+            pro_velocidad = 10
+            pro_velocidad_2 = random.randint(10, 15)
+            velocidad_enemigo = 7
+
+        case _:
+            print("Opción no válida")
 
     #lineas 1
     line_1=[20,alto-40,0,alto-10]
@@ -156,15 +237,14 @@ def juego():
     # Tiempo del último disparo
     ultimo_disparo = 0        
 
-    #enemigos
-    enemigos =[]
-    frecuencia_enemigos = 1000
-    velocidad_enemigo = 3
-
     # Reloj para controlar FPS
     reloj = pygame.time.Clock()
     
     while ejecutando:
+        if score>=1500:
+            dificultad_idx=1
+        if score>=3000:
+            dificultad_idx=2
         
         # Procesar eventos
         for evento in pygame.event.get():
@@ -230,6 +310,8 @@ def juego():
         #score
         titulo = fuente.render(f"Score: {score}", True, GRIS)
         pantalla.blit(titulo, (ancho // 2 - titulo.get_width() // 2, 20))
+        titulo = fuente.render(f"{dificultad_opciones[dificultad_idx]}", True, GRIS)
+        pantalla.blit(titulo, (20, 20))
 
 
         # Mover y dibujar disparos
@@ -263,7 +345,15 @@ def juego():
             pygame.draw.circle(pantalla,BLANCO,(proyectil_3_pos[0],proyectil_3_pos[1]),10,0)
         else:
             proyectil_3_pos=[ancho+ajuste,0]
-            pro_velocidad=random.randint(2, 6)
+            match dificultad_idx:
+                case 0:
+                    pro_velocidad = random.randint(2, 6)
+                case 1:
+                    pro_velocidad = random.randint(5, 7)
+                case 2:
+                    pro_velocidad = random.randint(7, 10)
+                case _:
+                    print("Opción no válida")
             score+=1
         
         
