@@ -1,20 +1,18 @@
 🎮 Game Rec
-Game Rec es un juego de disparos arcade desarrollado con Python y Pygame. El jugador controla un cuadro rojo que debe moverse horizontalmente para evitar los proyectiles y disparar para evitar que los enemigos lo toquen. ¡Pon a prueba tus reflejos y mejora tu puntuación!
+¡Bienvenido a Game Rec, un juego arcade hecho con Python y Pygame! Controla un bloque rojo que debe esquivar proyectiles y enemigos, mientras dispara y recolecta municion para sobrevivir el mayor tiempo posible.
 
 🖼️  capture
 ![image](https://github.com/user-attachments/assets/f9782481-fd2e-4371-85ab-13e77c38e271)
 ![image](https://github.com/user-attachments/assets/43fd02fc-2dc5-4090-bf7b-d7e93468b1b6)
-![image](https://github.com/user-attachments/assets/186d34e3-976b-4c4b-aaa9-c0331ce81679)
+![image](https://github.com/user-attachments/assets/969e6471-b28d-4fa0-9eaf-1c0800a0bf36)
+
 
 
 🚀 Cómo Jugar
-Usa las teclas ← y → para moverte.
-
-Presiona Espacio para disparar.
-
-Evita todos los proyectiles enemigos.
-
-¡Intenta superar tu mejor puntuación!
+Tecla	Acción
+← / →	Mover jugador a izquierda / derecha
+Espacio	Disparar (limitado, recargable)
+ESC	Volver al menú desde configuración
 
 
 
@@ -36,7 +34,7 @@ Salir: Cierra el juego.
 🧠 Mecánicas del Juego
 El juego aumenta su dificultad automáticamente según la puntuación.
 
-Las colisiones están implementadas para proyectiles, enemigos y el jugador.
+Las colisiones están implementadas para proyectiles, enemigos,recargas y el jugador.
 
 Se reproducen sonidos al disparar y al perder.
 
@@ -48,8 +46,6 @@ Disparo: sonidos/golpeconraqueta.wav
 Fondo: sonidos/cancionJuegoTenis.wav
 
 Game Over: sonidos/perdiste.wav
-
-Asegúrate de tener estos archivos de sonido en la carpeta /sonidos para que el juego funcione correctamente.
 
 📦 Requisitos
 Python 3.10+
@@ -76,4 +72,4 @@ python main.py
 └── README.md
 
 ✍️ Autor
-Desarrollado por Elmer Daza.
+Elmer Daza.
