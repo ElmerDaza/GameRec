@@ -41,6 +41,7 @@ dificultad_idx = 0
 fuente = pygame.font.SysFont(None, 60)
 fuente_2 = pygame.font.SysFont(None, 20)
 fuente_3 = pygame.font.SysFont(None, 35)
+fuente_4 = pygame.font.SysFont(None,20)
 
 #puntuacion
 score = 0
@@ -193,7 +194,7 @@ def juego():
 
     #proyectilES
     proyectil_1_pos=[ancho,0]
-    numero = random.randint(ancho/2, ancho)
+    numero = random.randint((ancho/2)-20, ancho)
     proyectil_2_pos=[numero,0]
     ajuste=random.randint(50, 200)
     proyectil_3_pos=[ancho+ajuste,0]
@@ -236,7 +237,15 @@ def juego():
     # milisegundos (1000 ms / 2 = 500 ms por disparo = 2 por segundo)
     frecuencia_disparo = 250  
     # Tiempo del último disparo
-    ultimo_disparo = 0        
+    ultimo_disparo = 0 
+    disparos_cant =6       
+
+    #recargar disparos
+    num = random.randint((ancho//2)+60, ancho+(ancho//5))
+    recarga_tam = 15
+    recarga_pos =[num,-recarga_tam]
+    recarga_vel = 2
+    recarga_cantidad = 6
 
     # Reloj para controlar FPS
     reloj = pygame.time.Clock()
@@ -265,9 +274,11 @@ def juego():
         tiempo_actual = pygame.time.get_ticks()
         # Verifica si ha pasado suficiente tiempo desde el último disparo
         if teclas[pygame.K_SPACE] and tiempo_actual - ultimo_disparo >= frecuencia_disparo:
-            disparo_nuevo = [jugador_pos[0] + jugador_tam, jugador_pos[1] + jugador_tam//2]
-            disparos.append(disparo_nuevo)
-            ultimo_disparo = tiempo_actual
+            if disparos_cant>0:
+                disparo_nuevo = [jugador_pos[0] + jugador_tam, jugador_pos[1] + jugador_tam//2]
+                disparos.append(disparo_nuevo)
+                ultimo_disparo = tiempo_actual
+                disparos_cant-=1
         """if teclas[pygame.K_UP]:
             jugador_pos[1] -= velocidad
         if teclas[pygame.K_DOWN]:
@@ -280,6 +291,10 @@ def juego():
             for i in range(0,random.randint(1, 3)):
                 enemi = [ancho+jugador_tam, (alto-120)-(len(enemigos)*jugador_tam)]
                 enemigos.append(enemi)
+            
+        #mover recarga
+        recarga_pos[0]-=recarga_vel
+        recarga_pos[1]+=recarga_vel
             
 
         #mover proyectiles
@@ -325,10 +340,23 @@ def juego():
         for enemigo in enemigos[:]:
             enemigo[0]-=velocidad_enemigo
             pygame.draw.rect(pantalla,PURPLE,(enemigo[0],enemigo[1],jugador_tam, jugador_tam))
-        
+
+        #dibujar recarga
+        if(recarga_pos[1]< alto-20):
+            pygame.draw.circle(pantalla,ROJO,(recarga_pos[0]+7,recarga_pos[1]-7),recarga_tam-4,0)
+            pygame.draw.circle(pantalla,AMARILLO,(recarga_pos[0]+4,recarga_pos[1]-4),recarga_tam-2,0)
+            pygame.draw.circle(pantalla,AZUL,(recarga_pos[0],recarga_pos[1]),recarga_tam,0)
+            pantalla.blit(fuente_4.render(f"{recarga_cantidad}", True, NEGRO),(recarga_pos[0]-5,recarga_pos[1]-5))
+        else:
+            num = random.randint((ancho//2)+60, ancho+(ancho//5))
+            recarga_pos =[num,-recarga_tam]
+            recarga_cantidad=6+random.randint(1,3)
         # Dibujar al jugador (un cuadrado rojo)
         pygame.draw.rect(pantalla, ROJO, 
                         (jugador_pos[0], jugador_pos[1], jugador_tam, jugador_tam))
+        
+        pantalla.blit(fuente_4.render(f"{disparos_cant}", True, GRIS), (jugador_pos[0]+20, jugador_pos[1]+20))
+        
         
         # dibujar proyectiles
         if(proyectil_1_pos[1]< alto-20):
@@ -436,6 +464,12 @@ def juego():
             fin()
         if colision_circulo_rect(proyectil_3_pos, proyectil_tam-3, rect):
             fin()
+        #colicion con la reacarga
+        rect = pygame.Rect(jugador_pos[0], jugador_pos[1], jugador_tam, jugador_tam)
+        if colision_circulo_rect(recarga_pos, recarga_tam-3, rect):
+            disparos_cant += recarga_cantidad
+            num = random.randint((ancho//2)+60, ancho+(ancho//5))
+            recarga_pos =[num,-recarga_tam]
 
         # Actualizar pantalla
         pygame.display.flip()
